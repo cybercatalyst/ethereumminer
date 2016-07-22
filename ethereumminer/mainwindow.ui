@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>722</width>
+    <height>674</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>QtMiner</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="tabEthereum">
+       <attribute name="title">
+        <string>Ethereum</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>Type:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>VRAM Reserve:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="9" column="0">
+           <widget class="QLabel" name="label_8">
+            <property name="text">
+             <string>Password:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="10" column="0">
+           <widget class="QLabel" name="label_9">
+            <property name="text">
+             <string>Server:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="9" column="1">
+           <widget class="QLineEdit" name="lineEditPassword"/>
+          </item>
+          <item row="8" column="1">
+           <widget class="QLineEdit" name="lineEditUsername"/>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="label_5">
+            <property name="text">
+             <string>OpenCL local work size:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="1">
+           <widget class="QComboBox" name="comboBoxCLGlobalWork">
+            <item>
+             <property name="text">
+              <string>2048</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>4096</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>8192</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>16384</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>32768</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QComboBox" name="comboBoxCLLocalWork">
+            <item>
+             <property name="text">
+              <string>16</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>32</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>64</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>128</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>256</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QSpinBox" name="spinBoxVRAMReserve"/>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>Mining Threads:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="11" column="0">
+           <widget class="QLabel" name="label_10">
+            <property name="text">
+             <string>Port:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="10" column="1">
+           <widget class="QLineEdit" name="lineEditServer"/>
+          </item>
+          <item row="6" column="0">
+           <widget class="QLabel" name="label_6">
+            <property name="text">
+             <string>OpenCL global work size:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="2">
+           <widget class="QLabel" name="label_4">
+            <property name="text">
+             <string>MB</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QSpinBox" name="spinBoxMiningThread"/>
+          </item>
+          <item row="11" column="1">
+           <widget class="QLineEdit" name="lineEditPort"/>
+          </item>
+          <item row="8" column="0">
+           <widget class="QLabel" name="label_7">
+            <property name="text">
+             <string>Account/Username:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="comboBoxMinerType"/>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="checkBoxCPUCL">
+          <property name="text">
+           <string>Recognize CPU as OpenCL device</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="checkBoxPrecomputeDAG">
+          <property name="text">
+           <string>Precompute next DAG</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QPushButton" name="pushButtonStart">
+            <property name="text">
+             <string>Start</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButtonStop">
+            <property name="text">
+             <string>Stop</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButtonRestart">
+            <property name="text">
+             <string>Restart</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButtonListDevices">
+            <property name="text">
+             <string>List all OpenCL devices</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBox">
+          <property name="title">
+           <string>Mining Status</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_2">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_11">
+             <property name="text">
+              <string>Current hashrate:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLineEdit" name="lineEditHashrate">
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2">
+            <widget class="QLabel" name="label_12">
+             <property name="text">
+              <string>H/s</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+    <item>
+     <widget class="QTextEdit" name="textEditConsole">
+      <property name="font">
+       <font>
+        <family>Ubuntu Mono</family>
+       </font>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>

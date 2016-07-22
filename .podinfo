@@ -1,0 +1,5 @@
+[qtethminer]
+author=Jacob Dawid
+description=Library that links the ethereum miner directly.
+license=AGPLv3
+website=
