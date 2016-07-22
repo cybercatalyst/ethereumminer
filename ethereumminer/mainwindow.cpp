@@ -21,6 +21,7 @@
 // Qt includes
 #include <QSettings>
 #include <QScrollBar>
+#include <QDateTime>
 
 // Own includes
 #include "mainwindow.h"
@@ -42,6 +43,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->comboBoxMinerType->addItem(OPENCL_MINER_STRING);
     updateUI();
 
+    connect(_ethereumMiner, SIGNAL(dagCreationProgress(int)),
+            this, SLOT(updateDAGProgress(int)));
+    connect(_ethereumMiner, SIGNAL(receivedWorkPackage(QString,QString,QString)),
+            this, SLOT(receivedWorkPackage(QString,QString,QString)));
+    connect(_ethereumMiner, SIGNAL(solutionFound(QString,QString,QString)),
+            this, SLOT(solutionFound(QString,QString,QString)));
+
     startTimer(2000);
 }
 
@@ -62,6 +70,30 @@ void MainWindow::setupStdOutRedirect() {
     }
 #endif
     // TODO: How to do this on Windows?
+}
+
+void MainWindow::updateDAGProgress(int progress) {
+    ui->progressBarDAGCreation->setValue(progress);
+}
+
+void MainWindow::receivedWorkPackage(
+    QString headerHash,
+    QString seedHash,
+    QString boundary) {
+    ui->lineEditLastWork->setText(QDateTime().toString());
+    ui->lineEditWorkPackageHeaderHash->setText(headerHash);
+    ui->lineEditWorkPackageSeedHash->setText(seedHash);
+    ui->lineEditWorkPackageBoundary->setText(boundary);
+}
+
+void MainWindow::solutionFound(
+    QString nonce,
+    QString headerHash,
+    QString mixHash) {
+    ui->lineEditLastSolutionFound->setText(QDateTime().toString());
+    ui->lineEditSubmittedNonce->setText(nonce);
+    ui->lineEditSubmittedHeaderHash->setText(headerHash);
+    ui->lineEditSubmittedMixHash->setText(mixHash);
 }
 
 void MainWindow::stdOutActivated(int fileDescriptor) {
@@ -102,6 +134,7 @@ void MainWindow::updateUI() {
     ui->lineEditPassword->setText(_miningConfiguration.password);
     ui->lineEditPort->setText(QString("%1").arg(_miningConfiguration.port));
     ui->comboBoxCLLocalWork->setCurrentText(QString("%1").arg(_miningConfiguration.localWorkSize));
+    ui->lineEditMsPerBatch->setText(QString("%1").arg(_miningConfiguration.msPerBatch));
     ui->lineEditUsername->setText(_miningConfiguration.username);
     ui->checkBoxCPUCL->setChecked(_miningConfiguration.recognizeCPUAsOpenCLDevice);
     ui->checkBoxPrecomputeDAG->setChecked(_miningConfiguration.precomputeNextDAG);
@@ -157,6 +190,10 @@ void MainWindow:: on_comboBoxCLLocalWork_activated(QString text) {
     _miningConfiguration.localWorkSize = text.toInt();
 }
 
+void MainWindow::on_lineEditMsPerBatch_textChanged(QString text) {
+    _miningConfiguration.msPerBatch = text.toInt();
+}
+
 void MainWindow:: on_lineEditUsername_textChanged(QString text) {
     _miningConfiguration.username = text;
 }
@@ -170,6 +207,7 @@ void MainWindow:: on_checkBoxPrecomputeDAG_stateChanged(int state) {
 }
 
 void MainWindow:: on_pushButtonStart_clicked() {
+    ui->tabWidget->setCurrentWidget(ui->tabStatus);
     _ethereumMiner->setMiningConfiguration(_miningConfiguration);
     _ethereumMiner->startMining();
 }

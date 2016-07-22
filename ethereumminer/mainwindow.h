@@ -50,6 +50,7 @@ public slots:
     void on_lineEditPassword_textChanged(QString text);
     void on_lineEditPort_textChanged(QString text);
     void on_comboBoxCLLocalWork_activated(QString text);
+    void on_lineEditMsPerBatch_textChanged(QString text);
     void on_lineEditUsername_textChanged(QString text);
     void on_checkBoxCPUCL_stateChanged(int state);
     void on_checkBoxPrecomputeDAG_stateChanged(int state);
@@ -66,6 +67,9 @@ protected:
 
 private slots:
     void stdOutActivated(int fileDesciptor);
+    void updateDAGProgress(int progress);
+    void receivedWorkPackage(QString headerHash, QString seedHash, QString boundary);
+    void solutionFound(QString nonce, QString headerHash, QString mixHash);
 
 private:
     void setupStdOutRedirect();
