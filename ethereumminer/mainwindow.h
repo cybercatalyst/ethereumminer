@@ -38,7 +38,7 @@ class MainWindow :
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(EthereumMiner *ethereumMiner, QWidget *parent = 0);
     ~MainWindow();
 
 public slots:
@@ -57,7 +57,6 @@ public slots:
     void on_pushButtonStart_clicked();
     void on_pushButtonStop_clicked();
     void on_pushButtonRestart_clicked();
-    void on_pushButtonListDevices_clicked();
 
 protected:
     void updateUI();
@@ -66,17 +65,14 @@ protected:
     void closeEvent(QCloseEvent *e);
 
 private slots:
-    void stdOutActivated(int fileDesciptor);
     void updateDAGProgress(int progress);
     void receivedWorkPackage(QString headerHash, QString seedHash, QString boundary);
     void solutionFound(QString nonce, QString headerHash, QString mixHash);
+    void platformInfo(QString platformInfo);
+    void currentStepChanged(EthereumMiner::Step step);
 
 private:
-    void setupStdOutRedirect();
-
     Ui::MainWindow *ui;
-
-    QSocketNotifier *_stdOutSocketNotifier;
 
     EthereumMiner::MiningConfiguration _miningConfiguration;
     EthereumMiner *_ethereumMiner;

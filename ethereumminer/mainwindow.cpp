@@ -30,18 +30,13 @@
 #define CPU_MINER_STRING "CPU Miner"
 #define OPENCL_MINER_STRING "OpenCL Miner"
 
-MainWindow::MainWindow(QWidget *parent) :
+MainWindow::MainWindow(EthereumMiner *ethereumMiner, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow) {
     ui->setupUi(this);
-    setupStdOutRedirect();
+
     _settings = new QSettings("QtEthminer", "QtEthminer");
-    _ethereumMiner = new EthereumMiner();
-    _ethereumMiner->loadSettings(*_settings);
-    _miningConfiguration = _ethereumMiner->miningConfiguration();
-    ui->comboBoxMinerType->addItem(CPU_MINER_STRING);
-    ui->comboBoxMinerType->addItem(OPENCL_MINER_STRING);
-    updateUI();
+    _ethereumMiner = ethereumMiner;
 
     connect(_ethereumMiner, SIGNAL(dagCreationProgress(int)),
             this, SLOT(updateDAGProgress(int)));
@@ -49,27 +44,21 @@ MainWindow::MainWindow(QWidget *parent) :
             this, SLOT(receivedWorkPackage(QString,QString,QString)));
     connect(_ethereumMiner, SIGNAL(solutionFound(QString,QString,QString)),
             this, SLOT(solutionFound(QString,QString,QString)));
+    connect(_ethereumMiner, SIGNAL(platformInfo(QString)),
+            this, SLOT(platformInfo(QString)));
+    connect(_ethereumMiner, SIGNAL(currentStep(EthereumMiner::Step)),
+            this, SLOT(currentStepChanged(EthereumMiner::Step)));
 
+    _ethereumMiner->loadSettings(*_settings);
+    _miningConfiguration = _ethereumMiner->miningConfiguration();
+    ui->comboBoxMinerType->addItem(CPU_MINER_STRING);
+    ui->comboBoxMinerType->addItem(OPENCL_MINER_STRING);
+    updateUI();
     startTimer(2000);
 }
 
 MainWindow::~MainWindow() {
     delete ui;
-}
-
-void MainWindow::setupStdOutRedirect() {
-#ifdef Q_OS_UNIX
-    // Redirect our own stdout/stderr.
-    int pipeDescriptors[2];
-    if(::pipe(pipeDescriptors) == 0) {
-        ::dup2(pipeDescriptors[1], STDOUT_FILENO);
-        ::dup2(pipeDescriptors[1], STDERR_FILENO);
-        _stdOutSocketNotifier = new QSocketNotifier(pipeDescriptors[0], QSocketNotifier::Read, this);
-        connect(_stdOutSocketNotifier, SIGNAL(activated(int)),
-                this, SLOT(stdOutActivated(int)));
-    }
-#endif
-    // TODO: How to do this on Windows?
 }
 
 void MainWindow::updateDAGProgress(int progress) {
@@ -80,7 +69,7 @@ void MainWindow::receivedWorkPackage(
     QString headerHash,
     QString seedHash,
     QString boundary) {
-    ui->lineEditLastWork->setText(QDateTime().toString());
+    ui->lineEditLastWork->setText(QDateTime::currentDateTime().toString());
     ui->lineEditWorkPackageHeaderHash->setText(headerHash);
     ui->lineEditWorkPackageSeedHash->setText(seedHash);
     ui->lineEditWorkPackageBoundary->setText(boundary);
@@ -90,27 +79,36 @@ void MainWindow::solutionFound(
     QString nonce,
     QString headerHash,
     QString mixHash) {
-    ui->lineEditLastSolutionFound->setText(QDateTime().toString());
+    ui->lineEditLastSolutionFound->setText(QDateTime::currentDateTime().toString());
     ui->lineEditSubmittedNonce->setText(nonce);
     ui->lineEditSubmittedHeaderHash->setText(headerHash);
     ui->lineEditSubmittedMixHash->setText(mixHash);
 }
 
-void MainWindow::stdOutActivated(int fileDescriptor) {
-    char readBuffer[1024];
-    int numberOfBytesRead = ::read(fileDescriptor, readBuffer, sizeof(readBuffer) - 1);
-    if(numberOfBytesRead > 0) {
-        // Terminate buffer - just in case.
-        readBuffer[numberOfBytesRead] = (char)0;
+void MainWindow::platformInfo(QString platformInfo) {
+    ui->lineEditPlatformInfo->setText(platformInfo);
+}
 
-        bool atBottom = (ui->textEditConsole->verticalScrollBar()->sliderPosition()
-            == ui->textEditConsole->verticalScrollBar()->maximum());
-        ui->textEditConsole->append(QString::fromUtf8(readBuffer));
-
-        if(atBottom) {
-            ui->textEditConsole->verticalScrollBar()->setSliderPosition(
-                ui->textEditConsole->verticalScrollBar()->maximum());
-        }
+void MainWindow::currentStepChanged(EthereumMiner::Step step) {
+    switch(step) {
+    case EthereumMiner::Starting:
+        ui->lineEditCurrentStep->setText("Starting");
+        break;
+    case EthereumMiner::Halted:
+        ui->lineEditCurrentStep->setText("Halted");
+        break;
+    case EthereumMiner::Connecting:
+        ui->lineEditCurrentStep->setText("Connecting");
+        break;
+    case EthereumMiner::LoggingIn:
+        ui->lineEditCurrentStep->setText("Logging in");
+        break;
+    case EthereumMiner::Mining:
+        ui->lineEditCurrentStep->setText("Mining");
+        break;
+    case EthereumMiner::BuildingDAG:
+        ui->lineEditCurrentStep->setText("Building DAG");
+        break;
     }
 }
 
@@ -159,7 +157,7 @@ void MainWindow::on_comboBoxCLGlobalWork_activated(QString text) {
     _miningConfiguration.globalWorkSizeMultiplier = text.toInt();
 }
 
-void MainWindow:: on_comboBoxMinerType_activated(QString text) {
+void MainWindow::on_comboBoxMinerType_activated(QString text) {
     EthereumMiner::MinerType type;
     if(text == CPU_MINER_STRING) {
         type = EthereumMiner::CPUMiner;
@@ -170,23 +168,23 @@ void MainWindow:: on_comboBoxMinerType_activated(QString text) {
     _miningConfiguration.minerType = type;
 }
 
-void MainWindow:: on_spinBoxVRAMReserve_valueChanged(int i) {
+void MainWindow::on_spinBoxVRAMReserve_valueChanged(int i) {
     _miningConfiguration.extraGPUMemory = i * 1000000;
 }
 
-void MainWindow:: on_spinBoxMiningThread_valueChanged(int i) {
+void MainWindow::on_spinBoxMiningThread_valueChanged(int i) {
     _miningConfiguration.maxMiningThreads = i;
 }
 
-void MainWindow:: on_lineEditPassword_textChanged(QString text) {
+void MainWindow::on_lineEditPassword_textChanged(QString text) {
     _miningConfiguration.password = text;
 }
 
-void MainWindow:: on_lineEditPort_textChanged(QString text) {
+void MainWindow::on_lineEditPort_textChanged(QString text) {
     _miningConfiguration.port = text.toInt();
 }
 
-void MainWindow:: on_comboBoxCLLocalWork_activated(QString text) {
+void MainWindow::on_comboBoxCLLocalWork_activated(QString text) {
     _miningConfiguration.localWorkSize = text.toInt();
 }
 
@@ -194,33 +192,28 @@ void MainWindow::on_lineEditMsPerBatch_textChanged(QString text) {
     _miningConfiguration.msPerBatch = text.toInt();
 }
 
-void MainWindow:: on_lineEditUsername_textChanged(QString text) {
+void MainWindow::on_lineEditUsername_textChanged(QString text) {
     _miningConfiguration.username = text;
 }
 
-void MainWindow:: on_checkBoxCPUCL_stateChanged(int state) {
+void MainWindow::on_checkBoxCPUCL_stateChanged(int state) {
     _miningConfiguration.recognizeCPUAsOpenCLDevice = (state == Qt::Checked);
 }
 
-void MainWindow:: on_checkBoxPrecomputeDAG_stateChanged(int state) {
+void MainWindow::on_checkBoxPrecomputeDAG_stateChanged(int state) {
     _miningConfiguration.precomputeNextDAG = (state == Qt::Checked);
 }
 
-void MainWindow:: on_pushButtonStart_clicked() {
+void MainWindow::on_pushButtonStart_clicked() {
     ui->tabWidget->setCurrentWidget(ui->tabStatus);
     _ethereumMiner->setMiningConfiguration(_miningConfiguration);
     _ethereumMiner->startMining();
 }
 
-void MainWindow:: on_pushButtonStop_clicked() {
+void MainWindow::on_pushButtonStop_clicked() {
     _ethereumMiner->stopMining();
 }
 
-void MainWindow:: on_pushButtonRestart_clicked() {
+void MainWindow::on_pushButtonRestart_clicked() {
     _ethereumMiner->restartMining();
 }
-
-void MainWindow::on_pushButtonListDevices_clicked() {
-    _ethereumMiner->listAvailableGPUs();
-}
-

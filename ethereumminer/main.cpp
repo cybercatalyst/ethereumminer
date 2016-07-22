@@ -20,13 +20,21 @@
 
 // Qt includes
 #include <QApplication>
+#include <QThread>
 
 // Own includes
 #include "mainwindow.h"
+#include "ethereumminer.h"
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
-    MainWindow w;
+
+    qRegisterMetaType<EthereumMiner::Step>("EthereumMiner::Step");
+
+    EthereumMiner *ethereumMiner = new EthereumMiner();
+    ethereumMiner->processInBackground();
+
+    MainWindow w(ethereumMiner);
     w.show();
 
     return a.exec();

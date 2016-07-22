@@ -13,3 +13,6 @@ HEADERS += mainwindow.h
 FORMS += mainwindow.ui
 
 include(../pods.pri)
+
+RESOURCES += \
+    resources.qrc

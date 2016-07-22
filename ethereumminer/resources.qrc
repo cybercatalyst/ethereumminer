@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>ETHEREUM-ICON_Black.png</file>
+    </qresource>
+</RCC>
